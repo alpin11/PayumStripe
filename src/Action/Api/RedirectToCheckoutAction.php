@@ -10,8 +10,7 @@ use Payum\Core\ApiAwareInterface;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Payum\Core\GatewayAwareInterface;
 use Payum\Core\GatewayAwareTrait;
-use Payum\Core\Reply\HttpResponse;
-use Payum\Core\Request\RenderTemplate;
+use Payum\Core\Reply\HttpRedirect;
 
 final class RedirectToCheckoutAction implements ActionInterface, ApiAwareInterface, GatewayAwareInterface
 {
@@ -33,15 +32,7 @@ final class RedirectToCheckoutAction implements ActionInterface, ApiAwareInterfa
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        /** @var RedirectToCheckout $request */
-        $renderTemplate = new RenderTemplate($this->templateName, [
-            'model' => $request->getModel(),
-            'publishable_key' => $this->api->getPublishableKey(),
-        ]);
-
-        $this->gateway->execute($renderTemplate);
-
-        throw new HttpResponse($renderTemplate->getResult());
+        throw new HttpRedirect($request->getFirstModel()['url']);
     }
 
     /**
